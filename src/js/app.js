@@ -1,7 +1,7 @@
 var deferredPrompt;
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-        .register('sw.js')
+        .register('sw.js', {updateViaCache: 'none'}) 
         .then(function() {
             console.log('Service worker is registered');
         });

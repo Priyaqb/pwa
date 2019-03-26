@@ -5,10 +5,11 @@ self.addEventListener('install', function(event) {
       .then(function(cache) {
           console.log('[Service Worker] Precaching App Shell');
           cache.addAll([
-              'index.html',
-              'src/js/app.js',
-              'src/css/app.css',
-              'src/images/todolist.png',
+              '/',
+              '/index.html',
+              '/src/js/app.js',
+              '/src/css/app.css',
+              '/src/images/todolist.png',
               'https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.min.js',
               'https://cdnjs.cloudflare.com/ajax/libs/fetch/3.0.0/fetch.min.js'
           ]);

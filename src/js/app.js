@@ -43,7 +43,7 @@ list.addEventListener('click', function(ev) {
 }, false);
 
 // Create a new list item when clicking on the "Add" button
-function newElement() {
+function newElement(data) {
 
     if (deferredPrompt) {
         deferredPrompt.prompt();
@@ -59,14 +59,17 @@ function newElement() {
     }
 
     var li = document.createElement("li");
-    var inputValue = document.getElementById("myInput").value;
+    var inputValue = data.description;
     var t = document.createTextNode(inputValue);
+    //li.appendChild(t);
+    console.log(data);
     li.appendChild(t);
-    if (inputValue === '') {
-        alert("You must write something!");
-    } else {
-        document.getElementById("myUL").appendChild(li);
-    }
+    //if (inputValue === '') {
+    //   alert("You must write something!");
+    //} else {
+    //   document.getElementById("myUL").appendChild(li);
+    //}
+    document.getElementById("myUL").appendChild(li);
     document.getElementById("myInput").value = "";
 
     var span = document.createElement("SPAN");
@@ -82,3 +85,26 @@ function newElement() {
         }
     }
 }
+function updateUI(data) {
+  //clearCards();
+  for (var i = 0; i < data.length; i++) {
+    newElement(data[i]);
+  }
+}
+
+var url = 'https://pwademo-4a910.firebaseio.com/lists.json';
+var networkDataReceived = false;
+
+fetch(url)
+  .then(function(res) {
+    return res.json();
+  })
+  .then(function(data) {
+    networkDataReceived = true;
+    console.log('From web', data);
+    var dataArray = [];
+    for (var key in data) {
+      dataArray.push(data[key]);
+    }
+    updateUI(dataArray);
+  });

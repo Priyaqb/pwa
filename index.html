@@ -27,9 +27,11 @@
     <div id="myDIV" class="header">
         <h2 style="margin:5px"><img src="src/images/todolist.png" alt="My To Do List"></h2>
         <h3><a href="/about.html">About Me</a></h3>
-        <input type="text" id="myInput" placeholder="Title...">
-        <span onclick="newElement()" class="addBtn">Add</span>
-    </div>
+        <form>
+            <input type="text" id="toDo" placeholder="Title...">
+            <button onclick="addElement()" class="addBtn">Add</button>
+        </form>
+    </div><!-- 
     <ul id="myUL">
         <li>Hit the gym</li>
         <li class="checked">Pay bills</li>
@@ -37,7 +39,11 @@
         <li>Buy eggs</li>
         <li>Read a book</li>
         <li>Organize office</li>
+    </ul> -->
+    <ul id="myUL">
     </ul>
+    <script src="/src/js/idb.js"></script>
+    <script src="/src/js/utility.js"></script>
     <script src="/src/js/app.js"></script>
 </body>
 

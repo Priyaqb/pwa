@@ -1,7 +1,7 @@
 var deferredPrompt;
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-        .register('/sw.js') 
+        .register('/sw.js')
         .then(function() {
             console.log('Service worker is registered');
         });
@@ -13,6 +13,10 @@ window.addEventListener("beforeinstallprompt", function(event) {
     deferredPrompt = event;
     return false;
 })
+
+var form = document.querySelector('form'),
+    toDoInput = document.querySelector('#toDo');
+
 
 var myNodelist = document.getElementsByTagName("LI");
 var i;
@@ -44,20 +48,6 @@ list.addEventListener('click', function(ev) {
 
 // Create a new list item when clicking on the "Add" button
 function newElement(data) {
-
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function(choiceResult) {
-            console.log(choiceResult.outcome);
-            if (choiceResult.outcome === "dismissed") {
-                console.log("User dismissed")
-            } else {
-                console.log("User added to homescreen")
-            }
-        })
-        deferredPrompt = null;
-    }
-
     var li = document.createElement("li");
     var inputValue = data.description;
     var t = document.createTextNode(inputValue);
@@ -70,7 +60,7 @@ function newElement(data) {
     //   document.getElementById("myUL").appendChild(li);
     //}
     document.getElementById("myUL").appendChild(li);
-    document.getElementById("myInput").value = "";
+    document.getElementById("toDo").value = "";
 
     var span = document.createElement("SPAN");
     var txt = document.createTextNode("\u00D7");
@@ -85,26 +75,108 @@ function newElement(data) {
         }
     }
 }
+
+function addElement() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(choiceResult) {
+            console.log(choiceResult.outcome);
+            if (choiceResult.outcome === "dismissed") {
+                console.log("User dismissed")
+            } else {
+                console.log("User added to homescreen")
+            }
+        })
+        deferredPrompt = null;
+    }
+}
+
+
 function updateUI(data) {
-  //clearCards();
-  for (var i = 0; i < data.length; i++) {
-    newElement(data[i]);
-  }
+    //clearCards();
+    for (var i = 0; i < data.length; i++) {
+        newElement(data[i]);
+    }
 }
 
 var url = 'https://pwademo-4a910.firebaseio.com/lists.json';
 var networkDataReceived = false;
 
 fetch(url)
-  .then(function(res) {
-    return res.json();
-  })
-  .then(function(data) {
-    networkDataReceived = true;
-    console.log('From web', data);
-    var dataArray = [];
-    for (var key in data) {
-      dataArray.push(data[key]);
+    .then(function(res) {
+        return res.json();
+    })
+    .then(function(data) {
+        networkDataReceived = true;
+        console.log('From web', data);
+        var dataArray = [];
+        for (var key in data) {
+            dataArray.push(data[key]);
+        }
+        updateUI(dataArray);
+    });
+
+if ('indexedDB' in window) {
+    readAllData('lists')
+        .then(function(data) {
+            if (!networkDataReceived) {
+                console.log('From cache', data);
+                updateUI(data);
+            }
+        });
+}
+
+
+function sendData() {
+  var post = {
+      id: new Date().toISOString(),
+      description: toDo.value
+  };
+  fetch('https://pwademo-4a910.firebaseio.com/lists.json', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+          },
+          body: JSON.stringify(post)
+    })
+    .then(function(res) {
+      console.log('Sent data', res);
+      writeData('lists', post);
+      readAllData('lists')
+        .then(function(data) {
+            updateUI(data);
+        });
+      
+    })
+}
+
+
+form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    if (toDoInput.value.trim() === '') {
+        alert('Please enter valid data!');
+        return;
     }
-    updateUI(dataArray);
-  });
+
+    sendData();
+    /*if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      navigator.serviceWorker.ready
+        .then(function(sw) {
+          var post = {
+            id: new Date().toISOString(),
+            description: toDo.value
+          };
+          writeData('sync-posts', post)
+            .then(function() {
+              return sw.sync.register('sync-new-posts');
+            })
+            .catch(function(err) {
+              console.log(err);
+            });
+        });
+    } else {
+      sendData();
+    }*/
+});

@@ -1,4 +1,8 @@
 var deferredPrompt;
+var closeLength;
+var close = [];
+
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
         .register('/sw.js')
@@ -28,15 +32,7 @@ for (i = 0; i < myNodelist.length; i++) {
     myNodelist[i].appendChild(span);
 }
 
-// Click on a close button to hide the current list item
-var close = document.getElementsByClassName("close");
-var i;
-for (i = 0; i < close.length; i++) {
-    close[i].onclick = function() {
-        var div = this.parentElement;
-        div.style.display = "none";
-    }
-}
+
 
 // Add a "checked" symbol when clicking on a list item
 var list = document.querySelector('ul');
@@ -68,10 +64,37 @@ function newElement(data) {
     span.appendChild(txt);
     li.appendChild(span);
 
-    for (i = 0; i < close.length; i++) {
-        close[i].onclick = function() {
+    // Click on a close button to hide the current list item
+    //var close = document.getElementsByClassName("close");
+    //var i;
+    
+    var t = new Date().toISOString();
+    close = document.getElementsByClassName("close");
+    for (closeLength = 0; closeLength < close.length; closeLength++) {
+        close[closeLength].onclick = function() {
             var div = this.parentElement;
+            var description = div.TextNode;
+            var post = {
+                id: closeLength - 1,
+                description: description
+            };
             div.style.display = "none";
+
+            
+            fetch('https://pwademo-4a910.firebaseio.com/lists/-LbDfFC6irDlV4i08oAK', {
+              method: 'delete'
+            })
+
+            /*
+            .then(function(res) {
+              console.log('Sent data', res);
+              writeData('lists', post);
+              readAllData('lists')
+                .then(function(data) {
+                    updateUI(data);
+                });
+              
+            })*/
         }
     }
 }
@@ -99,11 +122,13 @@ function updateUI(data) {
     }
 }
 
-var url = 'https://pwademo-4a910.firebaseio.com/lists.json';
+var t = new Date().toISOString();
+var url = 'https://pwademo-4a910.firebaseio.com/lists.json?t='+t;
 var networkDataReceived = false;
 
 fetch(url)
     .then(function(res) {
+        console.log(res)
         return res.json();
     })
     .then(function(data) {
@@ -128,12 +153,28 @@ if ('indexedDB' in window) {
 
 
 function sendData() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(choiceResult) {
+            console.log(choiceResult.outcome);
+            if (choiceResult.outcome === "dismissed") {
+                console.log("User dismissed")
+            } else {
+                console.log("User added to homescreen")
+            }
+        })
+        deferredPrompt = null;
+    }
+
   var post = {
-      id: new Date().toISOString(),
+      id: close.length,
       description: toDo.value
   };
   fetch('https://pwademo-4a910.firebaseio.com/lists.json', {
           method: 'POST',
+          mode: "cors",
+          cache: "no-cache",
+        
           headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json'

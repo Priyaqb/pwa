@@ -82,7 +82,11 @@ function newElement(data) {
 
             
             fetch('https://pwademo-4a910.firebaseio.com/lists/-LbDfFC6irDlV4i08oAK', {
-              method: 'delete'
+              method: 'delete',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
             })
 
             /*

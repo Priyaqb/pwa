@@ -5,11 +5,11 @@ var CACHE_STATIC_NAME = 'static-v3';
 var CACHE_DYNAMIC_NAME = 'dynamic-v1';
 var STATIC_FILES = [
   '/',
-  '/index.html',
-  '/src/js/app.js',
-  '/src/js/idb.js',
-  '/src/css/app.css',
-  '/src/images/todolist.png',
+  'index.html',
+  'src/js/app.js',
+  'src/js/idb.js',
+  'src/css/app.css',
+  'src/images/todolist.png',
   'https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/fetch/3.0.0/fetch.min.js'
 ];

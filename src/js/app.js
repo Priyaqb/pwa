@@ -81,7 +81,7 @@ function newElement(data) {
             div.style.display = "none";
 
             
-            fetch('https://pwademo-4a910.firebaseio.com/lists/-LbDfFC6irDlV4i08oAK', {
+            fetch('https://pwademo-4a910.firebaseio.com/lists/'+post, {
               method: 'delete',
               headers: {
                 'Content-Type': 'application/json',

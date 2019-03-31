@@ -3,8 +3,8 @@ var dbPromise = idb.open('list-store', 1, function (db) {
   if (!db.objectStoreNames.contains('lists')) {
     db.createObjectStore('lists', {keyPath: 'id'});
   }
-  if (!db.objectStoreNames.contains('sync-lists')) {
-    db.createObjectStore('sync-lists', {keyPath: 'id'});
+  if (!db.objectStoreNames.contains('sync-posts')) {
+    db.createObjectStore('sync-posts', {keyPath: 'id'});
   }
 });
 

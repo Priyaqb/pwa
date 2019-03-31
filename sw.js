@@ -80,7 +80,8 @@ function isInArray(string, array) {
 
 self.addEventListener('fetch', function (event) {
 
-  var url = 'https://pwademo-4a910.firebaseio.com/list.json';
+  var url = 'https://pwademo-4a910.firebaseio.com/lists.json';
+  console.log(event.request);
   if (event.request.url.indexOf(url) > -1) {
     event.respondWith(fetch(event.request)
       .then(function (res) {
@@ -91,6 +92,8 @@ self.addEventListener('fetch', function (event) {
           })
           .then(function (data) {
             for (var key in data) {
+              console.log(key, "++++")
+              console.log(data[key],"----")
               writeData('lists', data[key])
             }
           });
@@ -139,7 +142,7 @@ self.addEventListener('sync', function(event) {
       readAllData('sync-posts')
         .then(function(data) {
           for (var dt of data) {
-            fetch('https://pwademo-4a910.firebaseio.com/list.json', {
+            fetch('https://pwademo-4a910.firebaseio.com/lists.json', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

@@ -47,14 +47,7 @@ function newElement(data) {
     var li = document.createElement("li");
     var inputValue = data.description;
     var t = document.createTextNode(inputValue);
-    //li.appendChild(t);
-    console.log(data);
     li.appendChild(t);
-    //if (inputValue === '') {
-    //   alert("You must write something!");
-    //} else {
-    //   document.getElementById("myUL").appendChild(li);
-    //}
     document.getElementById("myUL").appendChild(li);
     document.getElementById("toDo").value = "";
 
@@ -65,8 +58,6 @@ function newElement(data) {
     li.appendChild(span);
 
     // Click on a close button to hide the current list item
-    //var close = document.getElementsByClassName("close");
-    //var i;
     
     var t = new Date().toISOString();
     close = document.getElementsByClassName("close");
@@ -81,8 +72,10 @@ function newElement(data) {
             div.style.display = "none";
 
             
-            fetch('https://pwademo-4a910.firebaseio.com/lists/-LbDfFC6irDlV4i08oAK', {
-              method: 'delete'
+            fetch('https://pwademo-4a910.firebaseio.com/lists/' + post, {
+              method: 'delete',
+              mode: "cors",
+              cache: "no-cache"
             })
 
             /*
@@ -122,13 +115,11 @@ function updateUI(data) {
     }
 }
 
-var t = new Date().toISOString();
-var url = 'https://pwademo-4a910.firebaseio.com/lists.json?t='+t;
+var url = 'https://pwademo-4a910.firebaseio.com/lists.json?t='+Math.random();
 var networkDataReceived = false;
 
 fetch(url)
     .then(function(res) {
-        console.log(res)
         return res.json();
     })
     .then(function(data) {
@@ -153,6 +144,30 @@ if ('indexedDB' in window) {
 
 
 function sendData() {
+    
+  var post = {
+      id: new Date().toISOString(),
+      description: toDo.value
+  };
+  var postArray = [post]
+  fetch('https://pwademo-4a910.firebaseio.com/lists.json', {
+          method: 'POST',
+          mode: "cors",
+          cache: "no-cache",
+        
+          headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+          },
+          body: JSON.stringify(post)
+    })
+    .then(function(res) {
+      updateUI(postArray)
+    })
+}
+
+
+form.addEventListener('submit', function(event) {
     if (deferredPrompt) {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(function(choiceResult) {
@@ -166,34 +181,6 @@ function sendData() {
         deferredPrompt = null;
     }
 
-  var post = {
-      id: close.length,
-      description: toDo.value
-  };
-  fetch('https://pwademo-4a910.firebaseio.com/lists.json', {
-          method: 'POST',
-          mode: "cors",
-          cache: "no-cache",
-        
-          headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-          },
-          body: JSON.stringify(post)
-    })
-    .then(function(res) {
-      console.log('Sent data', res);
-      writeData('lists', post);
-      readAllData('lists')
-        .then(function(data) {
-            updateUI(data);
-        });
-      
-    })
-}
-
-
-form.addEventListener('submit', function(event) {
     event.preventDefault();
 
     if (toDoInput.value.trim() === '') {
@@ -201,16 +188,18 @@ form.addEventListener('submit', function(event) {
         return;
     }
 
-    sendData();
-    /*if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
       navigator.serviceWorker.ready
         .then(function(sw) {
           var post = {
             id: new Date().toISOString(),
             description: toDo.value
           };
+          var postArray= [post]
+          updateUI(postArray)
           writeData('sync-posts', post)
             .then(function() {
+              console.log("writinggggg")
               return sw.sync.register('sync-new-posts');
             })
             .catch(function(err) {
@@ -219,5 +208,5 @@ form.addEventListener('submit', function(event) {
         });
     } else {
       sendData();
-    }*/
+    }
 });

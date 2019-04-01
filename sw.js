@@ -1,3 +1,4 @@
+
 importScripts('/src/js/idb.js');
 importScripts('/src/js/utility.js');
 
@@ -29,9 +30,21 @@ self.addEventListener('install', function (event) {
   });
 
 self.addEventListener('activate', function(event) {
-  console.log('[Service worker] Activating Service Worker..', event);
+  console.log('[Service Worker] Activating Service Worker ....', event);
+  event.waitUntil(
+    caches.keys()
+      .then(function(keyList) {
+        return Promise.all(keyList.map(function(key) {
+          if (key !== CACHE_STATIC_NAME && key !== CACHE_DYNAMIC_NAME) {
+            console.log('[Service Worker] Removing old cache.', key);
+            return caches.delete(key);
+          }
+        }));
+      })
+  );
   return self.clients.claim();
-})
+});
+
 
 
 function isInArray(string, array) {
@@ -47,8 +60,7 @@ function isInArray(string, array) {
 
 var url = 'https://todolist-4f5f3.firebaseio.com/list';
 self.addEventListener('fetch', function(event) {
-    
-    
+
     if (event.request.url.indexOf(url) > -1) {
         event.respondWith(fetch(event.request)
             .then(function (res) {
@@ -100,6 +112,7 @@ self.addEventListener('fetch', function(event) {
       
 
 })
+
 
 self.addEventListener('sync', function(event) {
     console.log('[Service Worker] Background syncing', event);

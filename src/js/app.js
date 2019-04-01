@@ -5,7 +5,7 @@ var titleInput = document.querySelector('#titleInput');
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-        .register('sw.js', {updateViaCache: 'none'}) 
+        .register('/sw.js') 
         .then(function() {
             console.log('Service worker is registered');
         });

@@ -1,4 +1,8 @@
 var deferredPrompt;
+var listArea = document.getElementById('myUL');
+var form = document.querySelector('form');
+var titleInput = document.querySelector('#titleInput');
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
         .register('sw.js', {updateViaCache: 'none'}) 
@@ -42,6 +46,22 @@ list.addEventListener('click', function(ev) {
     }
 }, false);
 
+
+// Show list items from firebase
+function createCard(data) {
+    var li = document.createElement("li");
+    var inputValue = data.desc;
+    var t = document.createTextNode(inputValue);
+    li.appendChild(t);
+    var span = document.createElement("SPAN");
+    var txt = document.createTextNode("\u00D7");
+    span.className = "close";
+    span.appendChild(txt);
+    li.appendChild(span);
+
+    listArea.appendChild(li);
+}
+
 // Create a new list item when clicking on the "Add" button
 function newElement() {
 
@@ -59,7 +79,7 @@ function newElement() {
     }
 
     var li = document.createElement("li");
-    var inputValue = document.getElementById("myInput").value;
+    var inputValue = document.getElementById("titleInput").value;
     var t = document.createTextNode(inputValue);
     li.appendChild(t);
     if (inputValue === '') {
@@ -67,7 +87,7 @@ function newElement() {
     } else {
         document.getElementById("myUL").appendChild(li);
     }
-    document.getElementById("myInput").value = "";
+    document.getElementById("titleInput").value = "";
 
     var span = document.createElement("SPAN");
     var txt = document.createTextNode("\u00D7");
@@ -82,3 +102,94 @@ function newElement() {
         }
     }
 }
+function clearCards() {
+    while(listArea.hasChildNodes()) {
+      listArea.removeChild(listArea.lastChild);
+    }
+  }
+
+function updateUI(data) {
+    //clearCards();
+    for (var i = 0; i < data.length; i++) {
+      createCard(data[i]);
+    }
+}
+var url = 'https://todolist-4f5f3.firebaseio.com/list.json';
+var networkDataReceived = false;
+
+fetch(url)
+  .then(function(res) {
+    return res.json();
+  })
+  .then(function(data) {
+    networkDataReceived = true;
+    console.log('From web', data);
+    var dataArray = [];
+    for (var key in data) {
+      dataArray.push(data[key]);
+    }
+    updateUI(dataArray);
+});
+
+
+//update UI from cache
+if ('indexedDB' in window) {
+    readAllData('lists')
+        .then(function(data){
+            if(!networkDataReceived){
+                console.log("From cache", data);
+                updateUI(data);
+            }
+        })
+}
+
+function sendData() {
+    fetch('https://todolist-4f5f3.firebaseio.com/list.json', {
+        method: 'POST',
+        headers : {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            id: new Date().toISOString,
+            desc: titleInput.value
+        })
+    })
+    .then(function(res) {
+        console.log('Sent Data');
+        updateUI();
+    })
+}
+
+form.addEventListener('submit', function(event){
+    event.preventDefault();
+
+    if (titleInput.value.trim() === "") {
+        alert("You must write something!");
+        return;
+    }
+
+
+
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready
+          .then(function(sw) {
+            var post = {
+              id: new Date().toISOString(),
+              desc: titleInput.value
+            };
+            writeData('sync-lists', post)
+              .then(function() {
+                return sw.sync.register('sync-new-item');
+              })
+              .then(function() {
+                console.log("List item saved for syncing");
+              })
+              .catch(function(err) {
+                console.log(err);
+              });
+          });
+      } else {
+        sendData();
+      }
+})

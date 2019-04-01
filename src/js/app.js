@@ -8,6 +8,8 @@ if ('serviceWorker' in navigator) {
         .register('/sw.js') 
         .then(function() {
             console.log('Service worker is registered');
+        }).catch(function(err){
+            console.log('Service worker registration failed', err);
         });
 }
 

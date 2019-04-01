@@ -92,8 +92,6 @@ self.addEventListener('fetch', function (event) {
           })
           .then(function (data) {
             for (var key in data) {
-              console.log(key, "++++")
-              console.log(data[key],"----")
               writeData('lists', data[key])
             }
           });

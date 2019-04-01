@@ -129,6 +129,7 @@ fetch(url)
         for (var key in data) {
             dataArray.push(data[key]);
         }
+        document.getElementById("myUL").innerHTML = "";
         updateUI(dataArray);
     });
 

@@ -42,6 +42,22 @@ list.addEventListener('click', function(ev) {
     }
 }, false);
 
+function deleteData() {
+  var postArray = [post]
+  fetch('https://us-central1-pwademo-8da90.cloudfunctions.net/removeListData', {
+          method: 'POST',
+          mode: "cors",
+          cache: "no-cache",
+        
+          headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+          },
+          body: JSON.stringify(post)
+    })
+}
+
+
 // Create a new list item when clicking on the "Add" button
 function newElement(data) {
     var li = document.createElement("li");
@@ -59,7 +75,6 @@ function newElement(data) {
 
     // Click on a close button to hide the current list item
     
-    var t = new Date().toISOString();
     close = document.getElementsByClassName("close");
     for (closeLength = 0; closeLength < close.length; closeLength++) {
         close[closeLength].onclick = function() {
@@ -71,23 +86,22 @@ function newElement(data) {
             };
             div.style.display = "none";
 
-            
-            fetch('https://pwademo-4a910.firebaseio.com/lists/' + post, {
-              method: 'delete',
-              mode: "cors",
-              cache: "no-cache"
-            })
 
-            /*
-            .then(function(res) {
-              console.log('Sent data', res);
-              writeData('lists', post);
-              readAllData('lists')
-                .then(function(data) {
-                    updateUI(data);
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+              navigator.serviceWorker.ready
+                .then(function(sw) {
+                  writeData('sync-delete-posts', post)
+                    .then(function() {
+                      console.log("writinggggg")
+                      return sw.sync.register('sync-new-delete-posts');
+                    })
+                    .catch(function(err) {
+                      console.log(err);
+                    });
                 });
-              
-            })*/
+            } else {
+              deleteData(post);
+            }
         }
     }
 }
@@ -115,7 +129,7 @@ function updateUI(data) {
     }
 }
 
-var url = 'https://pwademo-4a910.firebaseio.com/lists.json?t='+Math.random();
+var url = 'https://pwademo-8da90.firebaseio.com/lists.json';
 var networkDataReceived = false;
 
 fetch(url)
@@ -144,14 +158,9 @@ if ('indexedDB' in window) {
 }
 
 
-function sendData() {
-    
-  var post = {
-      id: new Date().toISOString(),
-      description: toDo.value
-  };
-  var postArray = [post]
-  fetch('https://pwademo-4a910.firebaseio.com/lists.json', {
+function sendData(post) {
+  var postArray= [post]
+  fetch('https://us-central1-pwademo-8da90.cloudfunctions.net/storeListData', {
           method: 'POST',
           mode: "cors",
           cache: "no-cache",
@@ -189,15 +198,18 @@ form.addEventListener('submit', function(event) {
         return;
     }
 
+    var post = {
+      id: close.length,
+      description: toDo.value
+    };
+
+    
+
     if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      var postArray= [post]
+      updateUI(postArray)
       navigator.serviceWorker.ready
         .then(function(sw) {
-          var post = {
-            id: new Date().toISOString(),
-            description: toDo.value
-          };
-          var postArray= [post]
-          updateUI(postArray)
           writeData('sync-posts', post)
             .then(function() {
               console.log("writinggggg")
@@ -208,6 +220,6 @@ form.addEventListener('submit', function(event) {
             });
         });
     } else {
-      sendData();
+      sendData(post);
     }
 });

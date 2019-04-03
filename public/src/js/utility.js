@@ -6,6 +6,9 @@ var dbPromise = idb.open('list-store', 1, function (db) {
   if (!db.objectStoreNames.contains('sync-posts')) {
     db.createObjectStore('sync-posts', {keyPath: 'id'});
   }
+  if (!db.objectStoreNames.contains('sync-delete-posts')) {
+    db.createObjectStore('sync-delete-posts', {keyPath: 'id'});
+  }
 });
 
 function writeData(st, data) {

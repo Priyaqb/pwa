@@ -165,4 +165,36 @@ self.addEventListener('sync', function(event) {
         })
     );
   }
+
+  if (event.tag === 'sync-new-delete-posts') {
+    console.log('[Service Worker] Syncing new Posts');
+    event.waitUntil(
+      readAllData('sync-delete-posts')
+        .then(function(data) {
+          for (var dt of data) {
+            fetch('https://us-central1-pwademo-8da90.cloudfunctions.net/removeListData', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                id: dt.id,
+                description: dt.description
+              })
+            })
+            .then(function(res) {
+              console.log('Sent data', res);
+              if (res.ok) {
+                deleteItemFromData('sync-posts', dt.id); // Isn't working correctly!
+              }
+            })
+            .catch(function(err) {
+              console.log('Error while sending data', err);
+            });
+          }
+
+        })
+    );
+  }
 });

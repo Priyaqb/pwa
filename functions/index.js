@@ -20,8 +20,8 @@ exports.storeListData = functions.https.onRequest((request, response) => {
  		id: request.body.id,
  		description: request.body.description
  	})
- 		.then(function(){
- 			response.status(201).json({message:"Data Stored", id:request.body.id})
+ 		.then(function(res){
+ 			response.status(201).json({message:"Data Stored", id:request.body.id, key:res.getKey()})
  		})
  		.catch(function(err){
  			response.status(500).json({error: err})

@@ -43,7 +43,7 @@ list.addEventListener('click', function(ev) {
 }, false);
 
 function deleteData() {
-  var postArray = [post]
+  /*var postArray = [post]
   fetch('https://us-central1-pwademo-8da90.cloudfunctions.net/removeListData', {
           method: 'POST',
           mode: "cors",
@@ -54,7 +54,7 @@ function deleteData() {
               'Accept': 'application/json'
           },
           body: JSON.stringify(post)
-    })
+    })*/
 }
 
 
@@ -73,24 +73,28 @@ function newElement(data) {
     span.appendChild(txt);
     li.appendChild(span);
 
+    var key = = document.createElement("SPAN");
+    var txt = data.id;
+    key.style.display = "none";
+
     // Click on a close button to hide the current list item
     
     close = document.getElementsByClassName("close");
     for (closeLength = 0; closeLength < close.length; closeLength++) {
         close[closeLength].onclick = function() {
             var div = this.parentElement;
-            var description = div.TextNode;
-            var post = {
-                id: closeLength - 1,
-                description: description
-            };
+            // var description = div.TextNode;
+            // var post = {
+            //     id: closeLength - 1,
+            //     description: description
+            // };
             div.style.display = "none";
 
 
             if ('serviceWorker' in navigator && 'SyncManager' in window) {
               navigator.serviceWorker.ready
                 .then(function(sw) {
-                  writeData('sync-delete-posts', post)
+                  writeData('sync-delete-posts', key)
                     .then(function() {
                       console.log("writinggggg")
                       return sw.sync.register('sync-new-delete-posts');
@@ -100,7 +104,7 @@ function newElement(data) {
                     });
                 });
             } else {
-              deleteData(post);
+              deleteData(key);
             }
         }
     }
@@ -199,7 +203,7 @@ form.addEventListener('submit', function(event) {
     }
 
     var post = {
-      id: close.length,
+      id: new Date();,
       description: toDo.value
     };
 

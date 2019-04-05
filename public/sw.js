@@ -151,11 +151,15 @@ self.addEventListener('sync', function(event) {
                 description: dt.description
               })
             })
-            .then(function(res) {
-              console.log('Sent data', res);
-              if (res.ok) {
-                deleteItemFromData('sync-posts', dt.id); // Isn't working correctly!
-              }
+            .then(function (res) {
+                if (res.ok) {
+                  deleteItemFromData('sync-posts', dt.id); 
+                }
+                return res.json();
+            })
+            .then(function(data) {
+              console.log(data,"=====");
+              
             })
             .catch(function(err) {
               console.log('Error while sending data', err);
@@ -184,7 +188,7 @@ self.addEventListener('sync', function(event) {
               })
             })
             .then(function(res) {
-              console.log('Sent data', res);
+              console.log('Sent data', res.data);
               if (res.ok) {
                 deleteItemFromData('sync-posts', dt.id); // Isn't working correctly!
               }

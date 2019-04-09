@@ -73,7 +73,7 @@ function newElement(data) {
     span.appendChild(txt);
     li.appendChild(span);
 
-    var key = = document.createElement("SPAN");
+    var key = document.createElement("SPAN");
     var txt = data.id;
     key.style.display = "none";
 
@@ -203,7 +203,7 @@ form.addEventListener('submit', function(event) {
     }
 
     var post = {
-      id: new Date();,
+      id: new Date(),
       description: toDo.value
     };
 

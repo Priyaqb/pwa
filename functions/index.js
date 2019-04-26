@@ -16,37 +16,53 @@ admin.initializeApp({
 
 exports.storeListData = functions.https.onRequest((request, response) => {
  cors(request, response, function(){
- 	admin.database().ref("lists").push({
- 		id: request.body.id,
- 		description: request.body.description
- 	})
- 		.then(function(res){
- 			response.status(201).json({message:"Data Stored", id:request.body.id, key:res.getKey()})
+ 	// admin.database().ref("lists").push({
+ 	// 	id: request.body.id,
+ 	// 	description: request.body.description,
+ 	// 	key: ""
+ 	// })
+ 	// 	.then(function(res){
+ 	// 		admin.database().ref("lists")
+ 	// 			.update({ id: request.body.id, description: request.body.description, key: res.getKey() });
+ 	// 		response.status(201).json({message:"Data Stored", id:request.body.id, key:res.getKey()})
+ 	// 	})
+ 	// 	.catch(function(err){
+ 	// 		response.status(500).json({error: err})
+ 	// 	})
+ 	var postData = {
+    id: request.body.id,
+		description: request.body.description,
+  };
+
+  var newPostKey = admin.database().ref().child('lists').push().key;
+  postData.key = newPostKey;
+
+  var updates = {};
+  updates['/lists/' + newPostKey] = postData;
+
+  admin.database().ref().update(updates)
+  	.then(function(res){
+ 			response.status(201).json({message:"Data Stored",key: newPostKey })
  		})
  		.catch(function(err){
  			response.status(500).json({error: err})
  		})
+
  })
 });
 
 // Delete an item
 
-exports.removeListData = functions.https.onRequest((request, response) => {
- cors(request, response, function(){
- 	var listRef = admin.database().child("lists");
-	var query = listRef.orderByChild("id").equalTo(2);
-	query.once("value", function(snapshot) {
-	   snapshot.forEach(function(itemSnapshot) {
-	       itemSnapshot.ref.remove();
-	   }); 
-	});
-	// console.log(request.body.id,"-------------")
- // 	admin.database().ref("lists").splice( request.body.id, 1 )
- // 		.then(function(){
- // 			response.status(201).json({message:"Deleted Data"})
- // 		})
- // 		.catch(function(err){
- // 			response.status(500).json({error: err})
- // 		})
- })
-});
+// exports.removeListData = functions.https.onRequest((request, response) => {
+//  cors(request, response, function(){
+
+//  		var removeData = admin.database().ref('lists');
+// 	  removeData.child(request.body.key).remove()
+// 	  	.then(function(res){
+// 	 			response.status(201).json({message:"Data Deleted" })
+// 	 		})
+// 	 		.catch(function(err){
+// 	 			response.status(500).json({error: err})
+// 	 		})
+// 	})
+// });

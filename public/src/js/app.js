@@ -67,47 +67,47 @@ function newElement(data) {
     document.getElementById("myUL").appendChild(li);
     document.getElementById("toDo").value = "";
 
-    var span = document.createElement("SPAN");
-    var txt = document.createTextNode("\u00D7");
-    span.className = "close";
-    span.appendChild(txt);
-    li.appendChild(span);
+    // var span = document.createElement("SPAN");
+    // var txt = document.createTextNode("\u00D7");
+    // span.className = "close";
+    // span.id = data.key;
+    // span.appendChild(txt);
+    // li.appendChild(span);
 
-    var key = = document.createElement("SPAN");
-    var txt = data.id;
-    key.style.display = "none";
+    // var key =  document.createElement("SPAN");
+    // var txt = data.id;
+    // key.style.display = "none";
 
     // Click on a close button to hide the current list item
     
-    close = document.getElementsByClassName("close");
-    for (closeLength = 0; closeLength < close.length; closeLength++) {
-        close[closeLength].onclick = function() {
-            var div = this.parentElement;
-            // var description = div.TextNode;
-            // var post = {
-            //     id: closeLength - 1,
-            //     description: description
-            // };
-            div.style.display = "none";
+    // close = document.getElementsByClassName("close");
+    // for (closeLength = 0; closeLength < close.length; closeLength++) {
+    //     close[closeLength].onclick = function() {
+    //         var div = this.parentElement;
+    //         div.style.display = "none";
+    //         var keyValue = this.id;
 
+    //         var post = {
+    //           key: keyValue
+    //         };
 
-            if ('serviceWorker' in navigator && 'SyncManager' in window) {
-              navigator.serviceWorker.ready
-                .then(function(sw) {
-                  writeData('sync-delete-posts', key)
-                    .then(function() {
-                      console.log("writinggggg")
-                      return sw.sync.register('sync-new-delete-posts');
-                    })
-                    .catch(function(err) {
-                      console.log(err);
-                    });
-                });
-            } else {
-              deleteData(key);
-            }
-        }
-    }
+    //         if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    //           navigator.serviceWorker.ready
+    //             .then(function(sw) {
+    //               writeData('sync-delete-posts', post)
+    //                 .then(function() {
+    //                   console.log("writinggggg")
+    //                   return sw.sync.register('sync-new-delete-posts');
+    //                 })
+    //                 .catch(function(err) {
+    //                   console.log(err);
+    //                 });
+    //             });
+    //         } else {
+    //           deleteData(key);
+    //         }
+    //     }
+    // }
 }
 
 function addElement() {
@@ -203,7 +203,7 @@ form.addEventListener('submit', function(event) {
     }
 
     var post = {
-      id: new Date();,
+      id: new Date(),
       description: toDo.value
     };
 

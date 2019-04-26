@@ -12,7 +12,6 @@ var dbPromise = idb.open('list-store', 1, function (db) {
 });
 
 function writeData(st, data) {
-  console.log(data,"testtt");
   return dbPromise
     .then(function(db) {
       var tx = db.transaction(st, 'readwrite');

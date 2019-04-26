@@ -6,6 +6,7 @@ var CACHE_DYNAMIC_NAME = 'dynamic-v1';
 var STATIC_FILES = [
   '/',
   'index.html',
+  'offline.html',
   'src/js/app.js',
   'src/js/idb.js',
   'src/css/app.css',
@@ -81,7 +82,6 @@ function isInArray(string, array) {
 self.addEventListener('fetch', function (event) {
 
   var url = 'https://pwademo-8da90.firebaseio.com/lists.json';
-  console.log(event.request);
   if (event.request.url.indexOf(url) > -1) {
     event.respondWith(fetch(event.request)
       .then(function (res) {
@@ -120,11 +120,11 @@ self.addEventListener('fetch', function (event) {
               })
               .catch(function (err) {
                 return caches.open(CACHE_STATIC_NAME)
-                  // .then(function (cache) {
-                  //   if (event.request.headers.get('accept').includes('text/html')) {
-                  //     return cache.match('/offline.html');
-                  //   }
-                  // });
+                  .then(function (cache) {
+                    if (event.request.headers.get('accept').includes('text/html')) {
+                      return cache.match('/offline.html');
+                    }
+                  });
               });
           }
         })
@@ -155,11 +155,6 @@ self.addEventListener('sync', function(event) {
                 if (res.ok) {
                   deleteItemFromData('sync-posts', dt.id); 
                 }
-                return res.json();
-            })
-            .then(function(data) {
-              console.log(data,"=====");
-              
             })
             .catch(function(err) {
               console.log('Error while sending data', err);
@@ -170,35 +165,34 @@ self.addEventListener('sync', function(event) {
     );
   }
 
-  if (event.tag === 'sync-new-delete-posts') {
-    console.log('[Service Worker] Syncing new Posts');
-    event.waitUntil(
-      readAllData('sync-delete-posts')
-        .then(function(data) {
-          for (var dt of data) {
-            fetch('https://us-central1-pwademo-8da90.cloudfunctions.net/removeListData', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-              },
-              body: JSON.stringify({
-                id: dt.id,
-                description: dt.description
-              })
-            })
-            .then(function(res) {
-              console.log('Sent data', res.data);
-              if (res.ok) {
-                deleteItemFromData('sync-posts', dt.id); // Isn't working correctly!
-              }
-            })
-            .catch(function(err) {
-              console.log('Error while sending data', err);
-            });
-          }
+  // if (event.tag === 'sync-new-delete-posts') {
+  //   console.log('[Service Worker] Syncing new Posts to Delete');
+  //   event.waitUntil(
+  //     readAllData('sync-delete-posts')
+  //       .then(function(data) {
+  //         for (var dt of data) {
+  //           fetch('https://us-central1-pwademo-8da90.cloudfunctions.net/removeListData', {
+  //             method: 'POST',
+  //             headers: {
+  //               'Content-Type': 'application/json',
+  //               'Accept': 'application/json'
+  //             },
+  //             body: JSON.stringify({
+  //               key: dt.key,
+  //             })
+  //           })
+  //           .then(function(res) {
+  //             console.log('Sent data', res);
+  //             if (res.ok) {
+  //               deleteItemFromData('sync-posts', dt.key); // Isn't working correctly!
+  //             }
+  //           })
+  //           .catch(function(err) {
+  //             console.log('Error while sending data', err);
+  //           });
+  //         }
 
-        })
-    );
-  }
+  //       })
+  //   );
+  // }
 });

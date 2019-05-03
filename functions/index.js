@@ -42,7 +42,7 @@ exports.storeListData = functions.https.onRequest((request, response) => {
 
   admin.database().ref().update(updates)
   	.then(function(res){
- 			response.status(201).json({message:"Data Stored",key: newPostKey })
+ 			response.status(201).json({message:"Data Stored",key: newPostKey, id: request.body.id })
  		})
  		.catch(function(err){
  			response.status(500).json({error: err})

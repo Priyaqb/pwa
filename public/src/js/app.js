@@ -1,6 +1,7 @@
 var deferredPrompt;
 var closeLength;
 var close = [];
+var listId;
 
 
 if ('serviceWorker' in navigator) {
@@ -66,6 +67,8 @@ function newElement(data) {
     li.appendChild(t);
     document.getElementById("myUL").appendChild(li);
     document.getElementById("toDo").value = "";
+    var listLength = document.getElementById("myUL").getElementsByTagName("li").length;
+    listId = listLength;
 
     // var span = document.createElement("SPAN");
     // var txt = document.createTextNode("\u00D7");
@@ -203,7 +206,7 @@ form.addEventListener('submit', function(event) {
     }
 
     var post = {
-      id: new Date(),
+      id: listId,
       description: toDo.value
     };
 

@@ -153,7 +153,11 @@ self.addEventListener('sync', function(event) {
             })
             .then(function (res) {
                 if (res.ok) {
-                  deleteItemFromData('sync-posts', dt.id); 
+                  res.json()
+                    .then(function(resData){
+                      console.log(resData,"-----",resData.id)
+                      deleteItemFromData('sync-posts', resData.id); 
+                    });
                 }
             })
             .catch(function(err) {

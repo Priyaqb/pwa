@@ -1,7 +1,7 @@
 var deferredPrompt;
 var closeLength;
 var close = [];
-var listId;
+var listId = 0;
 
 
 if ('serviceWorker' in navigator) {
@@ -61,14 +61,15 @@ function deleteData() {
 
 // Create a new list item when clicking on the "Add" button
 function newElement(data) {
+    //listId ++;
     var li = document.createElement("li");
     var inputValue = data.description;
     var t = document.createTextNode(inputValue);
     li.appendChild(t);
     document.getElementById("myUL").appendChild(li);
     document.getElementById("toDo").value = "";
-    var listLength = document.getElementById("myUL").getElementsByTagName("li").length;
-    listId = listLength;
+    //var listLength = document.getElementById("myUL").getElementsByTagName("li").length;
+    //listI
 
     // var span = document.createElement("SPAN");
     // var txt = document.createTextNode("\u00D7");
@@ -183,6 +184,12 @@ function sendData(post) {
     })
 }
 
+function guidGenerator() {
+    var S4 = function() {
+       return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    };
+    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+}
 
 form.addEventListener('submit', function(event) {
     if (deferredPrompt) {
@@ -206,7 +213,7 @@ form.addEventListener('submit', function(event) {
     }
 
     var post = {
-      id: listId,
+      id: guidGenerator(),
       description: toDo.value
     };
 
